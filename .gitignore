@@ -1,0 +1,26 @@
+# Visual Studio
+.vs/
+*.user
+*.suo
+*.VC.db
+*.VC.opendb
+
+# Build results
+[Bb]in/
+[Oo]bj/
+x64/
+Debug/
+Release/
+
+# Temporary files
+*.log
+*.tlog
+*.cache
+*.ilk
+*.pdb
+*.ipch
+*.db
+
+# OS-generated
+Thumbs.db
+.DS_Store
