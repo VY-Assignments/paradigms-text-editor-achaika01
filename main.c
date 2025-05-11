@@ -5,6 +5,7 @@ void resize_text();
 int get_free_space_in_arr();
 void init_text();
 void command(int input);
+void print();
 
 int rows = 10;
 int colums = 10;
@@ -36,7 +37,7 @@ void command(int input) {
         break;
     }
     case 2:
-        printf("Command %d Not implemented yet.\n", 2);
+        printf("Command %d Not implemented yet.\n", 3);
         break;
     case 3:
         printf("Command %d Not implemented yet.\n", 3);
@@ -45,7 +46,7 @@ void command(int input) {
         printf("Command %d Not implemented yet.\n", 4);
         break;
     case 5:
-        printf("Command %d Not implemented yet.\n", 5);
+        print();
         break;
     case 6:
         printf("Command %d Not implemented yet.\n", 6);
@@ -88,7 +89,9 @@ void append_symbols_end() {
     for (int i = 0; text_to_app_ptr[i] != '\0' && num + i < total_ar_size; i++) {
         poiner[num + i] = text_to_app_ptr[i];
     }
-
+    if (num + strlen(text_to_app_ptr) < total_ar_size) {
+        poiner[num + strlen(text_to_app_ptr)] = '\0';
+    }
     if (text_to_app_ptr != text_to_app) {
         free(text_to_app_ptr);
     }
@@ -115,6 +118,7 @@ void resize_text() {
     rows = new_rows;
     colums = new_colums;
 }
+
 int get_free_space_in_arr() {
     int count = 0;
     for (int i = 0; i < rows; i++) {
@@ -127,11 +131,26 @@ int get_free_space_in_arr() {
     }
     return rows*colums - count;
 }
+
 void init_text() {
     text = malloc(rows * sizeof(char*));
     for (int i = 0; i < rows; i++) {
         text[i] = calloc(colums, sizeof(char));
     }
+}
+
+void print() {
+    char* ptr = &text[0][0];
+    int total_size = rows * colums;
+    for (int i = 0; i < total_size && ptr[i] != '\0'; i++) {
+        int rw = i / colums;
+        int col = i - (rw * colums);
+        if (col == colums) {
+            printf('\n');
+        }
+        printf("%c", ptr[i]);
+    }
+    printf("\n");
 }
 
 
