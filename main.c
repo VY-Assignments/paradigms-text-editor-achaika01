@@ -2,10 +2,11 @@
 #include <stdlib.h>
 void append_symbols_end();
 void resize_text();
-int get_free_space_in_arr();
+int get_free_space_in_text();
 void init_text();
 void command(int input);
 void print();
+void start_new_line();
 
 int rows = 10;
 int colums = 10;
@@ -37,7 +38,7 @@ void command(int input) {
         break;
     }
     case 2:
-        printf("Command %d Not implemented yet.\n", 3);
+        start_new_line();
         break;
     case 3:
         printf("Command %d Not implemented yet.\n", 3);
@@ -58,23 +59,29 @@ void command(int input) {
 }
 
 void append_symbols_end() {
-    char text_to_app[100];
-    char* text_to_app_ptr = text_to_app;
+    int size = 100 * sizeof(char);          //do later: more than 100 doesn't work
+    char* text_to_app = malloc(size);
+    text_to_app[0] = '\0';
+
     printf("Enter text to append: \n");
-    fgets(text_to_app, sizeof(text_to_app), stdin);
-    int text_has_right_size = 0;
-    if (strlen(text_to_app) < sizeof(text_to_app)) {
-        char* new_to_app_ptr = calloc(1, (strlen(text_to_app) + 1));
-        strcpy(new_to_app_ptr, text_to_app_ptr);
-        text_to_app_ptr = new_to_app_ptr;
+    fgets(text_to_app, size, stdin);
+
+    if (strlen(text_to_app) + 1 > size) {
+        size *= 2;
+        char* new_to_app_ptr = realloc(text_to_app, size);
+        if (new_to_app_ptr == NULL) {
+            printf("Memory reallocation failed");
+        }
+        text_to_app = new_to_app_ptr;
+        new_to_app_ptr = NULL;
     }
-    for (int i = 0; i < strlen(text_to_app_ptr); i++) {
-        if (text_to_app_ptr[i] == '\n') {
-            text_to_app_ptr[i] = '\0';
-            text_has_right_size = 1;
+    for (int i = 0; i < strlen(text_to_app); i++) {
+        if (text_to_app[i] == '\n') {
+            text_to_app[i] = '\0';
         }
     }
-    if (strlen(text_to_app) > get_free_space_in_arr()) {
+
+    if (strlen(text_to_app) + 1 > get_free_space_in_text()) {
         resize_text();
     }
     char* poiner = &text[0][0];
@@ -86,15 +93,14 @@ void append_symbols_end() {
     int first_free_row = num / colums;
     int first_free_col = num - (first_free_row * colums);
 
-    for (int i = 0; text_to_app_ptr[i] != '\0' && num + i < total_ar_size; i++) {
-        poiner[num + i] = text_to_app_ptr[i];
+    for (int i = 0; text_to_app[i] != '\0' && num + i < total_ar_size; i++) {
+        poiner[num + i] = text_to_app[i];
     }
-    if (num + strlen(text_to_app_ptr) < total_ar_size) {
-        poiner[num + strlen(text_to_app_ptr)] = '\0';
+    if (num + strlen(text_to_app) < total_ar_size) {
+        poiner[num + strlen(text_to_app)] = '\0';
     }
-    if (text_to_app_ptr != text_to_app) {
-        free(text_to_app_ptr);
-    }
+    free(text_to_app);
+    text_to_app = NULL;
     
 }
 
@@ -119,7 +125,11 @@ void resize_text() {
     colums = new_colums;
 }
 
-int get_free_space_in_arr() {
+void resize_text_to_app() {
+
+}
+
+int get_free_space_in_text() {
     int count = 0;
     for (int i = 0; i < rows; i++) {
         for (int j = 0; j < colums; j++) {
@@ -146,14 +156,16 @@ void print() {
         int rw = i / colums;
         int col = i - (rw * colums);
         if (col == colums) {
-            printf('\n');
+            printf("\n");
         }
         printf("%c", ptr[i]);
     }
     printf("\n");
 }
 
+void start_new_line() {
 
+}
 
 //cd .\x64\
 //cd .\Debug
