@@ -10,6 +10,8 @@ void start_new_line();
 
 int rows = 10;
 int colums = 10;
+int start_from_row = 0;
+int current_index = 0;
 
 char** text = NULL;
 
@@ -59,6 +61,7 @@ void command(int input) {
 }
 
 void append_symbols_end() {
+    //text_to_app
     int size = 100 * sizeof(char);          //do later: more than 100 doesn't work
     char* text_to_app = malloc(size);
     text_to_app[0] = '\0';
@@ -71,6 +74,8 @@ void append_symbols_end() {
         char* new_to_app_ptr = realloc(text_to_app, size);
         if (new_to_app_ptr == NULL) {
             printf("Memory reallocation failed");
+            free(text_to_app);
+            return;
         }
         text_to_app = new_to_app_ptr;
         new_to_app_ptr = NULL;
@@ -80,25 +85,21 @@ void append_symbols_end() {
             text_to_app[i] = '\0';
         }
     }
-
+    //text
     if (strlen(text_to_app) + 1 > get_free_space_in_text()) {
         resize_text();
     }
     char* poiner = &text[0][0];
-    int num = 0;
     int total_ar_size = rows * colums;
-    while (num < total_ar_size && poiner[num] != '\0') {
-        num++;
-    }
-    int first_free_row = num / colums;
-    int first_free_col = num - (first_free_row * colums);
+    //int start_from = start_from_row * colums;  
+    //int first_free_row = start_from / colums;
+    //int first_free_col = start_from - (first_free_row * colums);
 
-    for (int i = 0; text_to_app[i] != '\0' && num + i < total_ar_size; i++) {
-        poiner[num + i] = text_to_app[i];
+    for (int i = 0; text_to_app[i] != '\0' && current_index + i < total_ar_size; i++) {
+        poiner[current_index + i] = text_to_app[i];
     }
-    if (num + strlen(text_to_app) < total_ar_size) {
-        poiner[num + strlen(text_to_app)] = '\0';
-    }
+    current_index += strlen(text_to_app);
+
     free(text_to_app);
     text_to_app = NULL;
     
@@ -125,10 +126,6 @@ void resize_text() {
     colums = new_colums;
 }
 
-void resize_text_to_app() {
-
-}
-
 int get_free_space_in_text() {
     int count = 0;
     for (int i = 0; i < rows; i++) {
@@ -151,11 +148,8 @@ void init_text() {
 
 void print() {
     char* ptr = &text[0][0];
-    int total_size = rows * colums;
-    for (int i = 0; i < total_size && ptr[i] != '\0'; i++) {
-        int rw = i / colums;
-        int col = i - (rw * colums);
-        if (col == colums) {
+    for (int i = 0; i < current_index; i++) {
+        if ((i + 1) % colums == 0) {
             printf("\n");
         }
         printf("%c", ptr[i]);
@@ -164,7 +158,19 @@ void print() {
 }
 
 void start_new_line() {
+    start_from_row++;
+    if (start_from_row >= rows) {
+        resize_text();
+    }
+    char* poiner = &text[0][0];
+    int total_ar_size = rows * colums;
+    int start_from = start_from_row * colums;
 
+    for (int i = current_index; i < start_from && i < total_ar_size; i++) {
+        poiner[i] = ' ';
+    }
+    current_index = start_from;
+    printf("New line started.\n");
 }
 
 //cd .\x64\
