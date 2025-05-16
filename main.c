@@ -9,6 +9,7 @@ void command(int input);
 void print();
 void start_new_line();
 void save_to_the_file(char* file_name);
+void load_from_file(char* file_name);
 
 int rows = 10;
 int colums = 10;
@@ -54,7 +55,12 @@ void command(int input) {
         free(file_name);
         break;
     case 4:
-        printf("Command %d Not implemented yet.\n", 4);
+        printf("Enter the file name for loading: ");
+        int size_l_fn = 100 * sizeof(char);
+        char* file_load_name = malloc(size_l_fn);
+        fgets(file_load_name, size_l_fn, stdin);
+        file_load_name[strcspn(file_load_name, "\n")] = 0;
+        load_from_file(file_load_name);
         break;
     case 5:
         print();
@@ -188,24 +194,37 @@ void start_new_line() {
     printf("New line started.\n");
 }
 
-void save_to_the_file(char* file_name) {
+void save_to_the_file(char* file_load_name) {        //чи видаляємо з постійної пам'яті?
     FILE* file;
-    file = fopen(file_name, "a");
+    file = fopen(file_load_name, "a");
     if (file != NULL)
     {
         char* ptr = &text[0][0];
         for (int i = 0; i < current_index; i++) {
             if (ptr[i] == '\0') {
-                //fputc(' ', file);
                 continue;
             }
             fputc(ptr[i], file);
-            if ((i + 1) % colums == 0) {//замінити симовли на пробіли
+            if ((i + 1) % colums == 0) {
                 fputs("\n", file);
             }
 
         }
         fclose(file);
+        printf("Successfuly saved\n");
+    }
+}
+
+void load_from_file(char* file_name) {
+    int ch;
+    FILE* file_load;
+    file_load = fopen(file_name, "r");
+    if (file_load != NULL)
+    {
+        while ((ch = fgetc(file_load)) != EOF) {
+            
+        }
+        fclose(file_load);
         printf("Successfuly saved\n");
     }
 }
