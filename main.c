@@ -1,3 +1,4 @@
+#define _CRT_SECURE_NO_WARNINGS
 #include <stdio.h>
 #include <stdlib.h>
 void append_symbols_end();
@@ -7,6 +8,7 @@ void init_text();
 void command(int input);
 void print();
 void start_new_line();
+void save_to_the_file(char* file_name);
 
 int rows = 10;
 int colums = 10;
@@ -16,7 +18,7 @@ int current_index = 0;
 char** text = NULL;
 
 int main(int argc, char* argv[]) {
-    printf("Commands:\n1.Append text symbols to the end\n2.Start the new line\n3.Use files to load the information\n4.Use files to save the information\n5.Print the current text to console\n6.Insert the text by line and symbol index\n7.Search\n8.End\n");
+    printf("Commands:\n1.Append text symbols to the end\n2.Start the new line\n3.Use files to save the information\n4.Use files to load the information\n5.Print the current text to console\n6.Insert the text by line and symbol index\n7.Search\n8.End\n");
     int user_command;
     init_text();
     do {
@@ -43,7 +45,13 @@ void command(int input) {
         start_new_line();
         break;
     case 3:
-        printf("Command %d Not implemented yet.\n", 3);
+        printf("Enter the file name for saving: ");
+        int size_fn = 100 * sizeof(char);
+        char* file_name = malloc(size_fn);
+        fgets(file_name, size_fn, stdin);
+        file_name[strcspn(file_name, "\n")] = 0;
+        save_to_the_file(file_name);
+        free(file_name);
         break;
     case 4:
         printf("Command %d Not implemented yet.\n", 4);
@@ -91,15 +99,15 @@ void append_symbols_end() {
     }
     char* poiner = &text[0][0];
     int total_ar_size = rows * colums;
-    //int start_from = start_from_row * colums;  
-    //int first_free_row = start_from / colums;
-    //int first_free_col = start_from - (first_free_row * colums);
 
     for (int i = 0; text_to_app[i] != '\0' && current_index + i < total_ar_size; i++) {
         poiner[current_index + i] = text_to_app[i];
     }
     current_index += strlen(text_to_app);
-
+    //
+    if (current_index < rows * colums) {
+        poiner[current_index] = '\0';
+    }
     free(text_to_app);
     text_to_app = NULL;
     
@@ -149,6 +157,9 @@ void init_text() {
 void print() {
     char* ptr = &text[0][0];
     for (int i = 0; i < current_index; i++) {
+        if (ptr[i] == '\0') {
+            continue;
+        }
         if ((i + 1) % colums == 0) {
             printf("\n");
         }
@@ -166,12 +177,40 @@ void start_new_line() {
     int total_ar_size = rows * colums;
     int start_from = start_from_row * colums;
 
-    for (int i = current_index; i < start_from && i < total_ar_size; i++) {
+    /*for (int i = current_index; i < (start_from - 1) && i < total_ar_size; i++) {
         poiner[i] = ' ';
+    }*/
+    if (current_index < total_ar_size) {
+        poiner[current_index] = '\n';
+        current_index++;
     }
     current_index = start_from;
     printf("New line started.\n");
 }
+
+void save_to_the_file(char* file_name) {
+    FILE* file;
+    file = fopen(file_name, "a");
+    if (file != NULL)
+    {
+        char* ptr = &text[0][0];
+        for (int i = 0; i < current_index; i++) {
+            if (ptr[i] == '\0') {
+                //fputc(' ', file);
+                continue;
+            }
+            fputc(ptr[i], file);
+            if ((i + 1) % colums == 0) {//замінити симовли на пробіли
+                fputs("\n", file);
+            }
+
+        }
+        fclose(file);
+        printf("Successfuly saved\n");
+    }
+}
+
+
 
 //cd .\x64\
 //cd .\Debug
