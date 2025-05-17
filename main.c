@@ -61,6 +61,7 @@ void command(int input) {
         fgets(file_load_name, size_l_fn, stdin);
         file_load_name[strcspn(file_load_name, "\n")] = 0;
         load_from_file(file_load_name);
+        free(file_load_name);
         break;
     case 5:
         print();
@@ -75,7 +76,6 @@ void command(int input) {
 }
 
 void append_symbols_end() {
-    //text_to_app
     int size = 100 * sizeof(char);          //do later: more than 100 doesn't work
     char* text_to_app = malloc(size);
     text_to_app[0] = '\0';
@@ -83,39 +83,27 @@ void append_symbols_end() {
     printf("Enter text to append: \n");
     fgets(text_to_app, size, stdin);
 
-    if (strlen(text_to_app) + 1 > size) {
-        size *= 2;
-        char* new_to_app_ptr = realloc(text_to_app, size);
-        if (new_to_app_ptr == NULL) {
-            printf("Memory reallocation failed");
-            free(text_to_app);
-            return;
-        }
-        text_to_app = new_to_app_ptr;
-        new_to_app_ptr = NULL;
-    }
     for (int i = 0; i < strlen(text_to_app); i++) {
         if (text_to_app[i] == '\n') {
             text_to_app[i] = '\0';
         }
     }
-    //text
-    if (strlen(text_to_app) + 1 > get_free_space_in_text()) {
-        resize_text();
+    
+    int len = strlen(text_to_app);
+    for (int i = 0; i < len; i++) {
+        int row = current_index / colums;
+        int col = current_index % colums;
+        if (row > rows || col > colums) {
+            resize_text();
+        }
+        text[row][col] = text_to_app[i];
+        current_index++;
     }
-    char* poiner = &text[0][0];
-    int total_ar_size = rows * colums;
 
-    for (int i = 0; text_to_app[i] != '\0' && current_index + i < total_ar_size; i++) {
-        poiner[current_index + i] = text_to_app[i];
-    }
-    current_index += strlen(text_to_app);
-    //
-    if (current_index < rows * colums) {
-        poiner[current_index] = '\0';
-    }
-    free(text_to_app);
-    text_to_app = NULL;
+    //current_index += len;
+    int row = current_index / colums;
+    int col = current_index % colums;
+    text[row][col] = '\0';
     
 }
 
@@ -152,6 +140,7 @@ int get_free_space_in_text() {
     }
     return rows*colums - count;
 }
+//?
 
 void init_text() {
     text = malloc(rows * sizeof(char*));
@@ -161,15 +150,15 @@ void init_text() {
 }
 
 void print() {
-    char* ptr = &text[0][0];
     for (int i = 0; i < current_index; i++) {
-        if (ptr[i] == '\0') {
-            continue;
-        }
-        if ((i + 1) % colums == 0) {
-            printf("\n");
-        }
-        printf("%c", ptr[i]);
+        int row = i / colums;
+        int col = i % colums;
+        char ch = text[row][col];
+        if (ch == '\0') continue;
+        printf("%c", ch);
+        //if (col == colums - 1) {
+        //    printf("\n");
+        //}
     }
     printf("\n");
 }
@@ -179,18 +168,15 @@ void start_new_line() {
     if (start_from_row >= rows) {
         resize_text();
     }
-    char* poiner = &text[0][0];
-    int total_ar_size = rows * colums;
-    int start_from = start_from_row * colums;
 
-    /*for (int i = current_index; i < (start_from - 1) && i < total_ar_size; i++) {
-        poiner[i] = ' ';
-    }*/
-    if (current_index < total_ar_size) {
-        poiner[current_index] = '\n';
+    if (current_index < rows * colums) {
+        int row = current_index / colums;
+        int col = current_index % colums;
+        text[row][col] = '\n';
         current_index++;
     }
-    current_index = start_from;
+
+    current_index = start_from_row * colums;
     printf("New line started.\n");
 }
 
@@ -199,16 +185,15 @@ void save_to_the_file(char* file_load_name) {        //чи видаляємо з постійної 
     file = fopen(file_load_name, "a");
     if (file != NULL)
     {
-        char* ptr = &text[0][0];
         for (int i = 0; i < current_index; i++) {
-            if (ptr[i] == '\0') {
-                continue;
-            }
-            fputc(ptr[i], file);
-            if ((i + 1) % colums == 0) {
+            int row = i / colums;
+            int col = i % colums;
+            char ch = text[row][col];
+            if (ch == '\0') continue;
+            fputc(ch, file);
+            if (col == colums - 1) {
                 fputs("\n", file);
             }
-
         }
         fclose(file);
         printf("Successfuly saved\n");
@@ -216,16 +201,52 @@ void save_to_the_file(char* file_load_name) {        //чи видаляємо з постійної 
 }
 
 void load_from_file(char* file_name) {
-    int ch;
+    char ch;
     FILE* file_load;
     file_load = fopen(file_name, "r");
     if (file_load != NULL)
     {
+        int size = 100 * sizeof(char);
+        char* text_load = malloc(size);
+        int len = 0;
         while ((ch = fgetc(file_load)) != EOF) {
-            
+            if (len + 1 >= size) {
+                size *= 2;
+                char* new_to_load_ptr = realloc(text_load, size);
+                if (new_to_load_ptr == NULL) {
+                    printf("Memory reallocation failed");
+                    free(text_load);
+                    fclose(file_load);
+                    return;
+                }
+                text_load = new_to_load_ptr;
+                new_to_load_ptr = NULL;
+            }
+
+            text_load[len++] = ch;
         }
+        text_load[len] = '\0';
+
+        if (strlen(text_load) + 1 > get_free_space_in_text()) {
+            resize_text();
+        }
+        
+        for (int i = 0; i < len; i++) {
+            int row = (current_index + i) / colums;
+            int col = (current_index + i) % colums;
+            if (row >= rows) {
+                resize_text();
+            }
+            text[row][col] = text_load[i];
+        }
+
+        current_index += len;
+
+        free(text_load);
+        text_load = NULL;
+
         fclose(file_load);
-        printf("Successfuly saved\n");
+        printf("Successfuly loaded\n");
     }
 }
 
