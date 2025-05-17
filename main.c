@@ -10,6 +10,7 @@ void print();
 void start_new_line();
 void save_to_the_file(char* file_name);
 void load_from_file(char* file_name);
+void search(char* user_input);
 
 int rows = 10;
 int colums = 10;
@@ -70,7 +71,12 @@ void command(int input) {
         printf("Command %d Not implemented yet.\n", 6);
         break;
     case 7:
-        printf("Command %d Not implemented yet.\n", 7);
+        printf("Enter char or word to search: ");
+        int size_search = 20 * sizeof(char);
+        char* word_search = malloc(size_search);
+        fgets(word_search, size_search, stdin);
+        word_search[strcspn(word_search, "\n")] = 0;
+        search(word_search);
         break;
     }
 }
@@ -93,7 +99,7 @@ void append_symbols_end() {
     for (int i = 0; i < len; i++) {
         int row = current_index / colums;
         int col = current_index % colums;
-        if (row > rows || col > colums) {
+        if (row >= rows || col >= colums) {
             resize_text();
         }
         text[row][col] = text_to_app[i];
@@ -196,6 +202,12 @@ void save_to_the_file(char* file_load_name) {        //чи видаляємо з постійної 
             }
         }
         fclose(file);
+        for (int i = 0; i < rows; i++) {
+            free(text[i]);
+        }
+        free(text);
+        text = NULL;
+
         printf("Successfuly saved\n");
     }
 }
@@ -250,7 +262,25 @@ void load_from_file(char* file_name) {
     }
 }
 
-
+void search(char* user_input) {
+    for (int i = 0; i <= current_index - strlen(user_input); i++) {
+        int match = 1;
+        for (int j = 0; j < strlen(user_input); j++) {
+            int r = (i + j) / colums;
+            int c = (i + j) % colums;
+            if (user_input[j] != text[r][c]) {
+                match = 0;
+                break;
+            }
+            
+        }
+        if (match) {
+            int match_row = i / colums;
+            int match_col = i % colums;
+            printf("Text is present in this position: %d %d\n", match_row, match_col);
+        }
+    }
+}
 
 //cd .\x64\
 //cd .\Debug
