@@ -11,6 +11,7 @@ void start_new_line();
 void save_to_the_file(char* file_name);
 void load_from_file(char* file_name);
 void search(char* user_input);
+void insert(char* user_input, int insert_row, int insert_col);
 
 int rows = 10;
 int colums = 10;
@@ -67,8 +68,21 @@ void command(int input) {
     case 5:
         print();
         break;
-    case 6:
-        printf("Command %d Not implemented yet.\n", 6);
+    case 6: {
+        int insert_row;
+        int insert_col;
+        printf("Enter char or word to search: ");
+        int size_insert = 20 * sizeof(char);
+        char* word_insert = malloc(size_insert);
+        fgets(word_insert, size_insert, stdin);
+        word_insert[strcspn(word_insert, "\n")] = 0;
+        printf("Enter row: ");
+        scanf("%d", &insert_row);
+        printf("Enter column: ");
+        scanf("%d", &insert_col);
+        insert(word_insert, insert_row, insert_col);
+    }
+
         break;
     case 7:
         printf("Enter char or word to search: ");
@@ -280,6 +294,54 @@ void search(char* user_input) {
             printf("Text is present in this position: %d %d\n", match_row, match_col);
         }
     }
+}
+
+void insert(char* user_input, int insert_row, int insert_col) {
+    int insert_index = insert_row * colums + insert_col;
+
+    while (insert_index + strlen(user_input) > rows * colums || current_index + strlen(user_input) > rows * colums) {
+        resize_text();
+    }
+
+    char** new_text = NULL;
+    new_text = malloc(rows * sizeof(char*));
+    for (int i = 0; i < rows; i++) {
+        new_text[i] = calloc(colums, sizeof(char));
+    }
+    int cur_index = 0;
+    for (int i = 0; i < insert_index && i < current_index; i++) {
+        int row = cur_index / colums;
+        int col = cur_index % colums;
+        new_text[row][col] = text[row][col];
+        cur_index++;
+    }
+
+    for (int i = 0; i < strlen(user_input); i++) {
+        int row = cur_index / colums;
+        int col = cur_index % colums;
+        new_text[row][col] = user_input[i];
+        cur_index++;
+    }
+
+    for (int i = insert_index; i < current_index; i++) {
+        int text_row = i / colums;
+        int text_col = i % colums;
+
+        int new_text_row = cur_index / colums;
+        int new_text_col = cur_index % colums;
+
+        new_text[new_text_row][new_text_col] = text[text_row][text_col];
+        cur_index++;
+    }
+
+    for (int i = 0; i < rows; i++) {
+        free(text[i]);
+    }
+    free(text);
+
+    text = new_text;
+    current_index = cur_index;
+    current_index = cur_index;
 }
 
 //cd .\x64\
