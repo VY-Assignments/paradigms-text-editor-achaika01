@@ -51,6 +51,10 @@ void command(int input) {
         printf("Enter the file name for saving: ");
         int size_fn = 100 * sizeof(char);
         char* file_name = malloc(size_fn);
+        if (file_name == NULL) {
+            printf("No file name");
+            break;
+        }
         fgets(file_name, size_fn, stdin);
         file_name[strcspn(file_name, "\n")] = 0;
         save_to_the_file(file_name);
@@ -60,6 +64,10 @@ void command(int input) {
         printf("Enter the file name for loading: ");
         int size_l_fn = 100 * sizeof(char);
         char* file_load_name = malloc(size_l_fn);
+        if (file_load_name == NULL) {
+            printf("No file name");
+            break;
+        }
         fgets(file_load_name, size_l_fn, stdin);
         file_load_name[strcspn(file_load_name, "\n")] = 0;
         load_from_file(file_load_name);
@@ -74,12 +82,26 @@ void command(int input) {
         printf("Enter char or word to search: ");
         int size_insert = 20 * sizeof(char);
         char* word_insert = malloc(size_insert);
+        if (word_insert == NULL) {
+            printf("No file name");
+            return;
+        }
         fgets(word_insert, size_insert, stdin);
         word_insert[strcspn(word_insert, "\n")] = 0;
         printf("Enter row: ");
-        scanf("%d", &insert_row);
+        if (scanf("%d", &insert_row) != 1) {
+            printf("Invalid input for row.\n");
+            int ch;
+            while ((ch = getchar()) != '\n' && ch != EOF);
+            return;
+        }
         printf("Enter column: ");
-        scanf("%d", &insert_col);
+        if (scanf("%d", &insert_col) != 1) {
+            printf("Invalid input for row.\n");
+            int ch;
+            while ((ch = getchar()) != '\n' && ch != EOF);
+            return;
+        }
         insert(word_insert, insert_row, insert_col);
     }
 
@@ -88,6 +110,10 @@ void command(int input) {
         printf("Enter char or word to search: ");
         int size_search = 20 * sizeof(char);
         char* word_search = malloc(size_search);
+        if (word_search == NULL) {
+            printf("No file name");
+            return;
+        }
         fgets(word_search, size_search, stdin);
         word_search[strcspn(word_search, "\n")] = 0;
         search(word_search);
@@ -96,7 +122,7 @@ void command(int input) {
 }
 
 void append_symbols_end() {
-    int size = 100 * sizeof(char);          //do later: more than 100 doesn't work
+    int size = 100 * sizeof(char);          
     char* text_to_app = malloc(size);
     text_to_app[0] = '\0';
 
@@ -160,7 +186,6 @@ int get_free_space_in_text() {
     }
     return rows*colums - count;
 }
-//?
 
 void init_text() {
     text = malloc(rows * sizeof(char*));
@@ -171,14 +196,15 @@ void init_text() {
 
 void print() {
     for (int i = 0; i < current_index; i++) {
+        if (text == NULL) {
+            printf("No text to print.\n");
+            break;
+        }
         int row = i / colums;
         int col = i % colums;
         char ch = text[row][col];
         if (ch == '\0') continue;
         printf("%c", ch);
-        //if (col == colums - 1) {
-        //    printf("\n");
-        //}
     }
     printf("\n");
 }
@@ -200,7 +226,7 @@ void start_new_line() {
     printf("New line started.\n");
 }
 
-void save_to_the_file(char* file_load_name) {        //чи видаляємо з постійної пам'яті?
+void save_to_the_file(char* file_load_name) {        
     FILE* file;
     file = fopen(file_load_name, "a");
     if (file != NULL)
