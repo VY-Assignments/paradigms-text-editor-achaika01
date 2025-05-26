@@ -1,11 +1,23 @@
 #define _CRT_SECURE_NO_WARNINGS
 #include "TextEditor.h"
 #include <iostream>
+#include <stdlib.h>
 
 TextEditor::TextEditor() {
     text = (char**)malloc(rows * sizeof(char*));
     for (int i = 0; i < rows; i++) {
         text[i] = (char*)calloc(colums, sizeof(char));
+    }
+}
+
+void TextEditor::resize_buffer() {
+    char* temp = (char*)realloc(buffer.buffer_array, buffer.size * 2 * sizeof(char));
+    if (temp != NULL) {
+        buffer.buffer_array = temp;
+        buffer.size *= 2;
+    }
+    else {
+        printf("memory allocation failed");
     }
 }
 
@@ -92,7 +104,7 @@ void TextEditor::command(int input) {
         search(word_search);
         break;
     }
-    case 8:
+    case 8: {
         int insert_row;
         int insert_col;
         int number_of_symb;
@@ -119,12 +131,38 @@ void TextEditor::command(int input) {
         }
         delete_symb(insert_row, insert_col, number_of_symb);
         break;
+    }
     case 9:
         printf("Not implemented Undo");
     case 10:
         printf("Not implemented Redo");
     case 11:
-        printf("Not implemented Ñut");
+        int cut_row;
+        int cut_col;
+        int number_of_symb;
+        printf("Enter row: ");
+        if (scanf("%d", &cut_row) != 1) {
+            printf("Invalid input for row.\n");
+            int ch;
+            while ((ch = getchar()) != '\n' && ch != EOF);
+            return;
+        }
+        printf("Enter column: ");
+        if (scanf("%d", &cut_col) != 1) {
+            printf("Invalid input for row.\n");
+            int ch;
+            while ((ch = getchar()) != '\n' && ch != EOF);
+            return;
+        }
+        printf("Enter number of symbols: ");
+        if (scanf("%d", &number_of_symb) != 1) {
+            printf("Invalid input for row.\n");
+            int ch;
+            while ((ch = getchar()) != '\n' && ch != EOF);
+            return;
+        }
+        cut(cut_row, cut_col, number_of_symb);
+        break;
     case 12:
         printf("Not implemented Paste");
     case 13:
@@ -481,4 +519,63 @@ void TextEditor::delete_symb(int delete_row, int delete_col, int number_symbols)
 
     text = new_text;
     current_index = cur_index;
+}
+
+void TextEditor::cut(int cut_row, int cut_col, int number_symbols) {
+    int cut_index = cut_row * colums + cut_col;
+
+    char** new_text = NULL;
+    new_text = (char**)malloc(rows * sizeof(char*));
+    for (int i = 0; i < rows; i++) {
+        new_text[i] = (char*)calloc(colums, sizeof(char));
+    }
+    int cur_index = 0;
+    for (int i = 0; i < cut_index && i < current_index; i++) {
+        int row = i / colums;
+        int col = i % colums;
+        new_text[row][col] = text[row][col];
+        cur_index++;
+    }
+    for (int i = cut_index; i < current_index; i++) {
+        if (i + number_symbols >= rows * colums) break;
+
+        int new_text_row = i / colums;
+        int new_text_col = i % colums;
+
+        int old_text_row = (i + number_symbols) / colums;
+        int old_text_col = (i + number_symbols) % colums;
+
+        new_text[new_text_row][new_text_col] = text[old_text_row][old_text_col];
+        cur_index++;
+    }
+
+    memset(buffer.buffer_array, 0, buffer.size * sizeof(char));
+
+    for (int i = 0; i < number_symbols; i++) {
+        if (cut_index + i >= rows * colums) break;
+
+        if (i >= buffer.size) {
+            resize_buffer();
+        }
+
+        int text_row = (i + cut_index) / colums;
+        int text_col = (i + cut_index) % colums;
+        
+        buffer.buffer_array[i] = text[text_row][text_col];
+    }
+
+    for (int i = 0; i < rows; i++) {
+        free(text[i]);
+    }
+    free(text);
+
+    text = new_text;
+    current_index = cur_index;
+}
+
+TextEditor::~TextEditor() {
+    for (int i = 0; i < rows; i++) {
+        free(text[i]);
+    }
+    free(text);
 }
