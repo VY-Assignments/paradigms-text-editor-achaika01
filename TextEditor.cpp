@@ -93,18 +93,43 @@ void TextEditor::command(int input) {
         break;
     }
     case 8:
-        printf("Not implemented");
+        int insert_row;
+        int insert_col;
+        int number_of_symb;
+        printf("Enter row: ");
+        if (scanf("%d", &insert_row) != 1) {
+            printf("Invalid input for row.\n");
+            int ch;
+            while ((ch = getchar()) != '\n' && ch != EOF);
+            return;
+        }
+        printf("Enter column: ");
+        if (scanf("%d", &insert_col) != 1) {
+            printf("Invalid input for row.\n");
+            int ch;
+            while ((ch = getchar()) != '\n' && ch != EOF);
+            return;
+        }
+        printf("Enter number of symbols: ");
+        if (scanf("%d", &number_of_symb) != 1) {
+            printf("Invalid input for row.\n");
+            int ch;
+            while ((ch = getchar()) != '\n' && ch != EOF);
+            return;
+        }
+        delete_symb(insert_row, insert_col, number_of_symb);
+        break;
     case 9:
-        printf("Not implemented");
+        printf("Not implemented Undo");
     case 10:
-        printf("Not implemented");
+        printf("Not implemented Redo");
     case 11:
-        printf("Not implemented");
+        printf("Not implemented Ñut");
     case 12:
-        printf("Not implemented");
+        printf("Not implemented Paste");
     case 13:
-        printf("Not implemented");
-    case 14:
+        printf("Not implemented Copy");
+    case 14: {
         int insert_row;
         int insert_col;
         printf("Enter char or word to insert: ");
@@ -133,6 +158,7 @@ void TextEditor::command(int input) {
         insert_with_replacement(word_insert, insert_row, insert_col);
 
         break;
+    }
     }
 }
 
@@ -419,4 +445,40 @@ void TextEditor::insert_with_replacement(char* user_input, int insert_row, int i
 
     text = new_text;
     current_index = cur_index;
-};
+}
+
+void TextEditor::delete_symb(int delete_row, int delete_col, int number_symbols) {
+    int delete_index = delete_row * colums + delete_col;
+
+    char** new_text = NULL;
+    new_text = (char**)malloc(rows * sizeof(char*));
+    for (int i = 0; i < rows; i++) {
+        new_text[i] = (char*)calloc(colums, sizeof(char));
+    }
+    int cur_index = 0;
+    for (int i = 0; i < delete_index && i < current_index; i++) {
+        int row = i / colums;
+        int col = i % colums;
+        new_text[row][col] = text[row][col];
+        cur_index++;
+    }
+    for (int i = delete_index; i < current_index; i++) {
+        int new_text_row = i / colums;
+        int new_text_col = i % colums;
+
+        if (i + number_symbols >= rows * colums) break;
+
+        int old_text_row = (i + number_symbols) / colums;
+        int old_text_col = (i + number_symbols) % colums;
+
+        new_text[new_text_row][new_text_col] = text[old_text_row][old_text_col];
+        cur_index++;
+    }
+    for (int i = 0; i < rows; i++) {
+        free(text[i]);
+    }
+    free(text);
+
+    text = new_text;
+    current_index = cur_index;
+}

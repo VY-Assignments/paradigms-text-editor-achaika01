@@ -23,4 +23,5 @@ public:
 	void insert(char* user_input, int insert_row, int insert_col);
 	void insert_with_replacement(char* user_input, int insert_row, int insert_col);
 	void append_symbols_end();
+	void delete_symb(int insert_row, int insert_col, int number_symbols);
 };
