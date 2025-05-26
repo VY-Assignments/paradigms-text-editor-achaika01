@@ -52,7 +52,7 @@ void TextEditor::command(int input) {
     case 6: {
         int insert_row;
         int insert_col;
-        printf("Enter char or word to search: ");
+        printf("Enter char or word to insert: ");
         int size_insert = 20 * sizeof(char);
         char* word_insert = (char*)malloc(size_insert);
         if (word_insert == NULL) {
@@ -92,6 +92,47 @@ void TextEditor::command(int input) {
         search(word_search);
         break;
     }
+    case 8:
+        printf("Not implemented");
+    case 9:
+        printf("Not implemented");
+    case 10:
+        printf("Not implemented");
+    case 11:
+        printf("Not implemented");
+    case 12:
+        printf("Not implemented");
+    case 13:
+        printf("Not implemented");
+    case 14:
+        int insert_row;
+        int insert_col;
+        printf("Enter char or word to insert: ");
+        int size_insert = 20 * sizeof(char);
+        char* word_insert = (char*)malloc(size_insert);
+        if (word_insert == NULL) {
+            printf("No file name");
+            return;
+        }
+        fgets(word_insert, size_insert, stdin);
+        word_insert[strcspn(word_insert, "\n")] = 0;
+        printf("Enter row: ");
+        if (scanf("%d", &insert_row) != 1) {
+            printf("Invalid input for row.\n");
+            int ch;
+            while ((ch = getchar()) != '\n' && ch != EOF);
+            return;
+        }
+        printf("Enter column: ");
+        if (scanf("%d", &insert_col) != 1) {
+            printf("Invalid input for row.\n");
+            int ch;
+            while ((ch = getchar()) != '\n' && ch != EOF);
+            return;
+        }
+        insert_with_replacement(word_insert, insert_row, insert_col);
+
+        break;
     }
 }
 
@@ -336,3 +377,46 @@ void TextEditor::insert(char* user_input, int insert_row, int insert_col) {
     text = new_text;
     current_index = cur_index;
 }
+
+void TextEditor::insert_with_replacement(char* user_input, int insert_row, int insert_col) {
+    int insert_index = insert_row * colums + insert_col;
+    while (insert_index + strlen(user_input) > rows * colums || current_index + strlen(user_input) > rows * colums) {
+        resize_text();
+    }
+    char** new_text = NULL;
+    new_text = (char**)malloc(rows * sizeof(char*));
+    for (int i = 0; i < rows; i++) {
+        new_text[i] = (char*)calloc(colums, sizeof(char));
+    }
+    int cur_index = 0;
+    for (int i = 0; i < insert_index && i < current_index; i++) {
+        int row = cur_index / colums;
+        int col = cur_index % colums;
+        new_text[row][col] = text[row][col];
+        cur_index++;
+    }
+    for (int i = 0; i < strlen(user_input); i++) {
+        int row = cur_index / colums;
+        int col = cur_index % colums;
+        new_text[row][col] = user_input[i];
+        cur_index++;
+    }
+    for (int i = insert_index; i < current_index; i++) {
+        int text_row = i / colums;
+        int text_col = i % colums;
+
+        int new_text_row = cur_index / colums;
+        int new_text_col = cur_index % colums;
+
+        new_text[new_text_row][new_text_col] = text[new_text_row][new_text_col];
+        cur_index++;
+    }
+
+    for (int i = 0; i < rows; i++) {
+        free(text[i]);
+    }
+    free(text);
+
+    text = new_text;
+    current_index = cur_index;
+};

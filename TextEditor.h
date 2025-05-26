@@ -21,5 +21,6 @@ public:
 	void load_from_file(char* file_name);
 	void search(char* user_input);
 	void insert(char* user_input, int insert_row, int insert_col);
+	void insert_with_replacement(char* user_input, int insert_row, int insert_col);
 	void append_symbols_end();
 };
