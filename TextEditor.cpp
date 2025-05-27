@@ -684,10 +684,12 @@ void TextEditor::copy(int copy_row, int copy_col, int number_symbols) {
 
         int text_row = (i + copy_index) / colums;
         int text_col = (i + copy_index) % colums;
+
+        if (text_row >= rows || text_col >= colums) break;
+
         buffer.buffer_array[i] = text[text_row][text_col];
     }
     buffer.buffer_array[number_symbols] = '\0';
-    current_index += strlen(buffer.buffer_array);
 }
 
 TextEditor::~TextEditor() {
