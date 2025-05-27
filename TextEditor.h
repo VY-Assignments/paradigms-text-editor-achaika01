@@ -39,5 +39,7 @@ public:
 	void append_symbols_end();
 	void delete_symb(int delete_row, int delete_col, int number_symbols);
 	void cut(int cut_row, int cut_col, int number_symbols);
+	void paste(int paste_row, int paste_col);
+	void copy(int copy_row, int copy_col, int number_symbols);
 	~TextEditor();
 };

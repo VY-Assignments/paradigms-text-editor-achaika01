@@ -136,7 +136,7 @@ void TextEditor::command(int input) {
         printf("Not implemented Undo");
     case 10:
         printf("Not implemented Redo");
-    case 11:
+    case 11: {
         int cut_row;
         int cut_col;
         int number_of_symb;
@@ -163,10 +163,57 @@ void TextEditor::command(int input) {
         }
         cut(cut_row, cut_col, number_of_symb);
         break;
-    case 12:
-        printf("Not implemented Paste");
-    case 13:
-        printf("Not implemented Copy");
+    }
+    case 12: {
+        int paste_row;
+        int paste_col;
+        printf("Enter row: ");
+        if (scanf("%d", &paste_row) != 1) {
+            printf("Invalid input for row.\n");
+            int ch;
+            while ((ch = getchar()) != '\n' && ch != EOF);
+            return;
+        }
+        printf("Enter column: ");
+        if (scanf("%d", &paste_col) != 1) {
+            printf("Invalid input for row.\n");
+            int ch;
+            while ((ch = getchar()) != '\n' && ch != EOF);
+            return;
+        }
+        paste(paste_row, paste_col);
+        break;
+    }
+        
+    case 13: {
+        int copy_row;
+        int copy_col;
+        int number_of_symb;
+        printf("Enter row: ");
+        if (scanf("%d", &copy_row) != 1) {
+            printf("Invalid input for row.\n");
+            int ch;
+            while ((ch = getchar()) != '\n' && ch != EOF);
+            return;
+        }
+        printf("Enter column: ");
+        if (scanf("%d", &copy_col) != 1) {
+            printf("Invalid input for row.\n");
+            int ch;
+            while ((ch = getchar()) != '\n' && ch != EOF);
+            return;
+        }
+        printf("Enter number of symbols: ");
+        if (scanf("%d", &number_of_symb) != 1) {
+            printf("Invalid input for row.\n");
+            int ch;
+            while ((ch = getchar()) != '\n' && ch != EOF);
+            return;
+        }
+        copy(copy_row, copy_col, number_of_symb);
+        break;
+    }
+        
     case 14: {
         int insert_row;
         int insert_col;
@@ -571,6 +618,76 @@ void TextEditor::cut(int cut_row, int cut_col, int number_symbols) {
 
     text = new_text;
     current_index = cur_index;
+}
+
+void TextEditor::paste(int paste_row, int paste_col) {
+    int paste_index = paste_row * colums + paste_col;
+
+    while (paste_index + strlen(buffer.buffer_array) > rows * colums || current_index + strlen(buffer.buffer_array) > rows * colums) {
+        resize_text();
+    }
+
+    char** new_text = NULL;
+    new_text = (char**)malloc(rows * sizeof(char*));
+    for (int i = 0; i < rows; i++) {
+        new_text[i] = (char*)calloc(colums, sizeof(char));
+    }
+    int cur_index = 0;
+    for (int i = 0; i < paste_index && i < current_index; i++) {
+        int row = cur_index / colums;
+        int col = cur_index % colums;
+        int old_row = i / colums;
+        int old_col = i % colums;
+        new_text[row][col] = text[old_row][old_col];
+        cur_index++;
+    }
+
+    for (int i = 0; i < strlen(buffer.buffer_array); i++) {
+        int row = cur_index / colums;
+        int col = cur_index % colums;
+        new_text[row][col] = buffer.buffer_array[i];
+        cur_index++;
+    }
+
+    for (int i = paste_index; i < current_index; i++) {
+        int text_row = i / colums;
+        int text_col = i % colums;
+
+        int new_text_row = cur_index / colums;
+        int new_text_col = cur_index % colums;
+
+        new_text[new_text_row][new_text_col] = text[text_row][text_col];
+        cur_index++;
+    }
+
+    for (int i = 0; i < rows; i++) {
+        free(text[i]);
+    }
+    free(text);
+
+    text = new_text;
+    current_index = cur_index;
+
+}
+
+void TextEditor::copy(int copy_row, int copy_col, int number_symbols) {
+    int copy_index = copy_row * colums + copy_col;
+
+    memset(buffer.buffer_array, 0, buffer.size * sizeof(char));
+
+    for (int i = 0; i < number_symbols; i++) {
+        if (copy_index + i >= current_index) break;
+
+        if (i >= buffer.size) {
+            resize_buffer();
+        }
+
+        int text_row = (i + copy_index) / colums;
+        int text_col = (i + copy_index) % colums;
+        buffer.buffer_array[i] = text[text_row][text_col];
+    }
+    buffer.buffer_array[number_symbols] = '\0';
+    current_index += strlen(buffer.buffer_array);
 }
 
 TextEditor::~TextEditor() {
