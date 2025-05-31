@@ -2,6 +2,8 @@
 #include "TextEditor.h"
 #include <iostream>
 #include <stdlib.h>
+#include <stack>
+using namespace std;
 
 TextEditor::TextEditor() {
     text = (char**)malloc(rows * sizeof(char*));
@@ -133,9 +135,11 @@ void TextEditor::command(int input) {
         break;
     }
     case 9:
-        printf("Not implemented Undo");
+        undo();
+        break;
     case 10:
         printf("Not implemented Redo");
+        break;
     case 11: {
         int cut_row;
         int cut_col;
@@ -251,6 +255,8 @@ void TextEditor::append_symbols_end() {
     int size = 100 * sizeof(char);
     char* text_to_app = (char*)malloc(size);
     text_to_app[0] = '\0';
+    int old_row = current_index / colums;
+    int old_col = current_index % colums;
 
     printf("Enter text to append: \n");
     fgets(text_to_app, size, stdin);
@@ -275,6 +281,10 @@ void TextEditor::append_symbols_end() {
     int col = current_index % colums;
     text[row][col] = '\0';
 
+    if (goes_to_undostack) {
+        push_undo(UndoAction::DELETE, old_row, old_col, strlen(text_to_app), text_to_app);
+    }
+    
 }
 
 void TextEditor::resize_text() {
@@ -326,7 +336,7 @@ void TextEditor::print() {
     printf("\n");
 }
 
-void TextEditor::start_new_line() {
+void TextEditor::start_new_line() {         //undo окремий кейс
     start_from_row++;
     if (start_from_row >= rows) {
         resize_text();
@@ -487,10 +497,24 @@ void TextEditor::insert(char* user_input, int insert_row, int insert_col) {
 
     text = new_text;
     current_index = cur_index;
+
+    if (goes_to_undostack) {
+        push_undo(UndoAction::DELETE, insert_row, insert_col, strlen(user_input));
+    }
+    
 }
 
 void TextEditor::insert_with_replacement(char* user_input, int insert_row, int insert_col) {
     int insert_index = insert_row * colums + insert_col;
+
+    char* deleted_text = (char*)malloc(strlen(user_input) + 1);
+    for (int i = 0; i < strlen(user_input); i++) {
+        int r = (insert_index + i) / colums;
+        int c = (insert_index + i) % colums;
+        deleted_text[i] = text[r][c];
+    }
+    deleted_text[strlen(user_input)] = '\0';
+
     while (insert_index + strlen(user_input) > rows * colums || current_index + strlen(user_input) > rows * colums) {
         resize_text();
     }
@@ -506,6 +530,7 @@ void TextEditor::insert_with_replacement(char* user_input, int insert_row, int i
         new_text[row][col] = text[row][col];
         cur_index++;
     }
+
     for (int i = 0; i < strlen(user_input); i++) {
         int row = cur_index / colums;
         int col = cur_index % colums;
@@ -530,10 +555,23 @@ void TextEditor::insert_with_replacement(char* user_input, int insert_row, int i
 
     text = new_text;
     current_index = cur_index;
+
+    if (goes_to_undostack) {
+        push_undo(UndoAction::DELETEINSERT, insert_row, insert_col, strlen(deleted_text), deleted_text);
+    }
+    
 }
 
 void TextEditor::delete_symb(int delete_row, int delete_col, int number_symbols) {
     int delete_index = delete_row * colums + delete_col;
+
+    char* deleted_text = (char*)malloc(number_symbols + 1);
+    for (int i = 0; i < number_symbols; i++) {
+        int r = (delete_index + i) / colums;
+        int c = (delete_index + i) % colums;
+        deleted_text[i] = text[r][c];
+    }
+    deleted_text[number_symbols] = '\0';
 
     char** new_text = NULL;
     new_text = (char**)malloc(rows * sizeof(char*));
@@ -566,10 +604,30 @@ void TextEditor::delete_symb(int delete_row, int delete_col, int number_symbols)
 
     text = new_text;
     current_index = cur_index;
+
+    if (goes_to_undostack) {
+        push_undo(UndoAction::INSERT, delete_row, delete_col, number_symbols, deleted_text);
+    }
+    
 }
 
 void TextEditor::cut(int cut_row, int cut_col, int number_symbols) {
     int cut_index = cut_row * colums + cut_col;
+
+    memset(buffer.buffer_array, 0, buffer.size * sizeof(char));
+
+    for (int i = 0; i < number_symbols; i++) {
+        if (cut_index + i >= rows * colums) break;
+
+        if (i >= buffer.size) {
+            resize_buffer();
+        }
+
+        int text_row = (i + cut_index) / colums;
+        int text_col = (i + cut_index) % colums;
+
+        buffer.buffer_array[i] = text[text_row][text_col];
+    }
 
     char** new_text = NULL;
     new_text = (char**)malloc(rows * sizeof(char*));
@@ -596,21 +654,6 @@ void TextEditor::cut(int cut_row, int cut_col, int number_symbols) {
         cur_index++;
     }
 
-    memset(buffer.buffer_array, 0, buffer.size * sizeof(char));
-
-    for (int i = 0; i < number_symbols; i++) {
-        if (cut_index + i >= rows * colums) break;
-
-        if (i >= buffer.size) {
-            resize_buffer();
-        }
-
-        int text_row = (i + cut_index) / colums;
-        int text_col = (i + cut_index) % colums;
-        
-        buffer.buffer_array[i] = text[text_row][text_col];
-    }
-
     for (int i = 0; i < rows; i++) {
         free(text[i]);
     }
@@ -618,6 +661,12 @@ void TextEditor::cut(int cut_row, int cut_col, int number_symbols) {
 
     text = new_text;
     current_index = cur_index;
+
+    if (goes_to_undostack) {
+        push_undo(UndoAction::INSERT, cut_row, cut_col, number_symbols, buffer.buffer_array);
+        //memset(buffer.buffer_array, 0, buffer.size * sizeof(char));
+    }
+    
 }
 
 void TextEditor::paste(int paste_row, int paste_col) {
@@ -667,10 +716,14 @@ void TextEditor::paste(int paste_row, int paste_col) {
 
     text = new_text;
     current_index = cur_index;
+    int buf_size = strlen(buffer.buffer_array);
 
+    if (goes_to_undostack) {
+        push_undo(UndoAction::DELETE, paste_row, paste_col, buf_size);
+    }
 }
 
-void TextEditor::copy(int copy_row, int copy_col, int number_symbols) {
+void TextEditor::copy(int copy_row, int copy_col, int number_symbols) { 
     int copy_index = copy_row * colums + copy_col;
 
     memset(buffer.buffer_array, 0, buffer.size * sizeof(char));
@@ -691,6 +744,53 @@ void TextEditor::copy(int copy_row, int copy_col, int number_symbols) {
     }
     buffer.buffer_array[number_symbols] = '\0';
 }
+
+
+void TextEditor::push_undo(UndoAction::ActionType type, int row, int col, int length, const char* data) {
+    if (!goes_to_undostack) return;
+    
+    if (data != NULL) {
+        undo_stack.push(new UndoAction(type, row, col, length, data));
+    }
+    else {
+        undo_stack.push(new UndoAction(type, row, col, length));
+    }
+
+};
+
+void TextEditor::undo() {
+
+    if (!undo_stack.empty()) {
+        UndoAction* und_act = undo_stack.top();
+        undo_stack.pop();
+
+        goes_to_undostack = false;
+
+        switch (und_act->type) {
+        case UndoAction::DELETE: {
+            delete_symb(und_act->row, und_act->column, und_act->length);
+            break;
+        }
+        case UndoAction::INSERT: {
+            insert(und_act->data, und_act->row, und_act->column);
+            break;
+        }
+        case UndoAction::DELETEINSERT: {
+            delete_symb(und_act->row, und_act->column, und_act->length);
+            insert(und_act->data, und_act->row, und_act->column);
+            break;
+        }
+          
+        }
+        delete und_act;
+        goes_to_undostack = true;
+    }
+    else
+    {
+        printf("No command to undo");
+    }
+
+};
 
 TextEditor::~TextEditor() {
     for (int i = 0; i < rows; i++) {
