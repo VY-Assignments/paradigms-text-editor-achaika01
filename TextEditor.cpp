@@ -138,7 +138,7 @@ void TextEditor::command(int input) {
         undo();
         break;
     case 10:
-        printf("Not implemented Redo");
+        redo();
         break;
     case 11: {
         int cut_row;
@@ -283,6 +283,7 @@ void TextEditor::append_symbols_end() {
 
     if (goes_to_undostack) {
         push_undo(UndoAction::DELETE, old_row, old_col, strlen(text_to_app), text_to_app);
+        while (!redo_stack.empty()) redo_stack.pop();
     }
     
 }
@@ -500,6 +501,7 @@ void TextEditor::insert(char* user_input, int insert_row, int insert_col) {
 
     if (goes_to_undostack) {
         push_undo(UndoAction::DELETE, insert_row, insert_col, strlen(user_input));
+        while (!redo_stack.empty()) redo_stack.pop();
     }
     
 }
@@ -558,6 +560,7 @@ void TextEditor::insert_with_replacement(char* user_input, int insert_row, int i
 
     if (goes_to_undostack) {
         push_undo(UndoAction::DELETEINSERT, insert_row, insert_col, strlen(deleted_text), deleted_text);
+        while (!redo_stack.empty()) redo_stack.pop();
     }
     
 }
@@ -607,6 +610,7 @@ void TextEditor::delete_symb(int delete_row, int delete_col, int number_symbols)
 
     if (goes_to_undostack) {
         push_undo(UndoAction::INSERT, delete_row, delete_col, number_symbols, deleted_text);
+        while (!redo_stack.empty()) redo_stack.pop();
     }
     
 }
@@ -664,6 +668,7 @@ void TextEditor::cut(int cut_row, int cut_col, int number_symbols) {
 
     if (goes_to_undostack) {
         push_undo(UndoAction::INSERT, cut_row, cut_col, number_symbols, buffer.buffer_array);
+        while (!redo_stack.empty()) redo_stack.pop();
         //memset(buffer.buffer_array, 0, buffer.size * sizeof(char));
     }
     
@@ -720,6 +725,7 @@ void TextEditor::paste(int paste_row, int paste_col) {
 
     if (goes_to_undostack) {
         push_undo(UndoAction::DELETE, paste_row, paste_col, buf_size);
+        while (!redo_stack.empty()) redo_stack.pop();
     }
 }
 
@@ -764,6 +770,8 @@ void TextEditor::undo() {
         UndoAction* und_act = undo_stack.top();
         undo_stack.pop();
 
+        redo_stack.push(new UndoAction(*und_act));
+
         goes_to_undostack = false;
 
         switch (und_act->type) {
@@ -790,6 +798,43 @@ void TextEditor::undo() {
         printf("No command to undo");
     }
 
+};
+
+void TextEditor::redo() {
+    if (redo_stack.empty()) {
+        printf("No command to redo\n");
+        return;
+    }
+
+    UndoAction* act = redo_stack.top();
+    redo_stack.pop();
+
+    goes_to_undostack = false;
+
+    UndoAction* inverse = nullptr;
+
+    switch (act->type) {
+    case UndoAction::DELETE:
+        insert(act->data, act->row, act->column);
+        inverse = new UndoAction(UndoAction::DELETE, act->row, act->column, act->length);
+        break;
+    case UndoAction::INSERT:
+        delete_symb(act->row, act->column, act->length);
+        inverse = new UndoAction(UndoAction::INSERT, act->row, act->column, act->length, act->data);
+        break;
+    case UndoAction::DELETEINSERT:
+        delete_symb(act->row, act->column, act->length);
+        insert(act->data, act->row, act->column);
+        inverse = new UndoAction(*act); 
+        break;
+    }
+
+    if (inverse != nullptr) {
+        undo_stack.push(inverse);
+    }
+
+    delete act;
+    goes_to_undostack = true;
 };
 
 TextEditor::~TextEditor() {

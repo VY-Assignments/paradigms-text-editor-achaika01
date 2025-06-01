@@ -53,6 +53,21 @@ private:
 			data = nullptr;
 		}
 
+		UndoAction(const UndoAction& other) {
+			type = other.type;
+			row = other.row;
+			column = other.column;
+			length = other.length;
+
+			if (other.data != nullptr) {
+				data = new char[length + 1];
+				strcpy(data, other.data);
+			}
+			else {
+				data = nullptr;
+			}
+		}
+
 		~UndoAction() {
 			if (data != nullptr) {
 				delete[] data;
@@ -62,6 +77,8 @@ private:
 	};
 
 	stack<UndoAction*> undo_stack;
+
+	stack<UndoAction*> redo_stack;
 
 	Buffer buffer;
 	void resize_text();
@@ -90,5 +107,6 @@ public:
 	void paste(int paste_row, int paste_col);
 	void copy(int copy_row, int copy_col, int number_symbols);
 	void undo();
+	void redo();
 	~TextEditor();
 };
