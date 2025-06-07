@@ -633,38 +633,7 @@ void TextEditor::cut(int cut_row, int cut_col, int number_symbols) {
         buffer.buffer_array[i] = text[text_row][text_col];
     }
 
-    char** new_text = NULL;
-    new_text = (char**)malloc(rows * sizeof(char*));
-    for (int i = 0; i < rows; i++) {
-        new_text[i] = (char*)calloc(colums, sizeof(char));
-    }
-    int cur_index = 0;
-    for (int i = 0; i < cut_index && i < current_index; i++) {
-        int row = i / colums;
-        int col = i % colums;
-        new_text[row][col] = text[row][col];
-        cur_index++;
-    }
-    for (int i = cut_index; i < current_index; i++) {
-        if (i + number_symbols >= rows * colums) break;
-
-        int new_text_row = i / colums;
-        int new_text_col = i % colums;
-
-        int old_text_row = (i + number_symbols) / colums;
-        int old_text_col = (i + number_symbols) % colums;
-
-        new_text[new_text_row][new_text_col] = text[old_text_row][old_text_col];
-        cur_index++;
-    }
-
-    for (int i = 0; i < rows; i++) {
-        free(text[i]);
-    }
-    free(text);
-
-    text = new_text;
-    current_index = cur_index;
+    delete_symb(cut_row, cut_col, number_symbols);
 
     if (goes_to_undostack) {
         push_undo(UndoAction::INSERT, cut_row, cut_col, number_symbols, buffer.buffer_array);
@@ -681,46 +650,8 @@ void TextEditor::paste(int paste_row, int paste_col) {
         resize_text();
     }
 
-    char** new_text = NULL;
-    new_text = (char**)malloc(rows * sizeof(char*));
-    for (int i = 0; i < rows; i++) {
-        new_text[i] = (char*)calloc(colums, sizeof(char));
-    }
-    int cur_index = 0;
-    for (int i = 0; i < paste_index && i < current_index; i++) {
-        int row = cur_index / colums;
-        int col = cur_index % colums;
-        int old_row = i / colums;
-        int old_col = i % colums;
-        new_text[row][col] = text[old_row][old_col];
-        cur_index++;
-    }
+    insert(buffer.buffer_array, paste_row, paste_col);
 
-    for (int i = 0; i < strlen(buffer.buffer_array); i++) {
-        int row = cur_index / colums;
-        int col = cur_index % colums;
-        new_text[row][col] = buffer.buffer_array[i];
-        cur_index++;
-    }
-
-    for (int i = paste_index; i < current_index; i++) {
-        int text_row = i / colums;
-        int text_col = i % colums;
-
-        int new_text_row = cur_index / colums;
-        int new_text_col = cur_index % colums;
-
-        new_text[new_text_row][new_text_col] = text[text_row][text_col];
-        cur_index++;
-    }
-
-    for (int i = 0; i < rows; i++) {
-        free(text[i]);
-    }
-    free(text);
-
-    text = new_text;
-    current_index = cur_index;
     int buf_size = strlen(buffer.buffer_array);
 
     if (goes_to_undostack) {
