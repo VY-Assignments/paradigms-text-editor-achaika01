@@ -13,11 +13,28 @@
     <ClCompile Include="TextEditor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="TextLine.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CheckListLine.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ContactLine.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TextClass.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include=".gitignore" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="TextEditor.h" />
+    <ClInclude Include="Headers\TextEditor.h" />
+    <ClInclude Include="Headers\Line.h" />
+    <ClInclude Include="Headers\TextLine.h" />
+    <ClInclude Include="Headers\CheckListLine.h" />
+    <ClInclude Include="Headers\ContactLine.h" />
+    <ClInclude Include="Headers\TextClass.h" />
   </ItemGroup>
 </Project>
