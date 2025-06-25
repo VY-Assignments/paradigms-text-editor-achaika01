@@ -36,7 +36,7 @@ TextLine* TextLine::deserialize(const std::byte* data, size_t size) {
     data++; 
     size--;
 
-    uint64_t len{};
+    uint64_t len = 0;
     memcpy(&len, data, sizeof(len));
     data += sizeof(len);
     size -= sizeof(len);

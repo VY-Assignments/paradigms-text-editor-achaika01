@@ -36,3 +36,35 @@ vector<byte> ContactLine::serialize() const {
 
 	return bytes;
 }
+
+ContactLine* ContactLine::deserialize(const std::byte* data, size_t size) {
+	const size_t type_size = sizeof(byte);
+	const size_t len_size = sizeof(uint64_t);
+
+	if (size < type_size + len_size) return nullptr;
+
+	data++;
+	size--;
+
+
+	uint64_t len_name = 0;
+	memcpy(&len_name, data, sizeof(len_name));
+	data += sizeof(len_name);
+	size -= sizeof(len_name);
+
+	if (size < len_name) return nullptr;
+
+	string name(reinterpret_cast<const char*>(data), len_name - 1);
+	data += len_name;
+	size -= len_name;
+
+	uint64_t len_email = 0;
+	memcpy(&len_email, data, sizeof(len_email));
+	data += sizeof(len_email);
+	size -= sizeof(len_email);
+
+	if (size < len_email) return nullptr;
+
+	string email(reinterpret_cast<const char*>(data), len_email - 1);
+
+	return new ContactLine(name, email);

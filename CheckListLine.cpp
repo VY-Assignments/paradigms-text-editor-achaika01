@@ -26,3 +26,31 @@ vector<byte> CheckListLine::serialize() const {
 
     return bytes;
 }
+
+CheckListLine* CheckListLine::deserialize(const std::byte* data, size_t size) {
+
+    const size_t type_size = sizeof(byte);
+    const size_t bool_size = sizeof(byte);
+    const size_t len_size = sizeof(uint64_t);
+
+    if (size < type_size + bool_size + len_size)
+        return nullptr;
+
+    data++;
+    size--;
+
+    bool checked = static_cast<bool>(*data);
+    data++;
+    size--;
+
+    uint64_t len = 0;
+    memcpy(&len, data, sizeof(len));
+    data += sizeof(len);
+    size -= sizeof(len);
+
+    if (size < len) return nullptr;
+
+    string item(reinterpret_cast<const char*>(data), len - 1);
+
+    return new CheckListLine(item, checked);
+}
