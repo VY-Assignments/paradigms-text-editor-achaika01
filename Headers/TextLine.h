@@ -2,14 +2,19 @@
 #pragma once
 #include "Line.h"
 #include <cstring> 
+#include <vector>
 
 class TextLine : public Line {
 	char* textline;
 public:
-	TextLine(const char* t) {
-		textline = new char[strlen(t) + 1];
-		strcpy(textline, t);
-	}
+	TextLine(const char* t);
+
 	void print() const override;
 
+	std::vector<std::byte> serialize() const override;
+	static TextLine* deserialize(const std::byte* data, size_t size);
+
+	LineType get_type() const override;
+
+	~TextLine();
 };

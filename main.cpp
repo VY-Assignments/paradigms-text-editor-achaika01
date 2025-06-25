@@ -7,7 +7,7 @@ using namespace std;
 int main(int argc, char* argv[]) {
     TextClass textclass;
 
-    printf("Commands: 1.Add line 2.Print 15.End\n");
+    printf("Commands: 1.Add line 2.Print 3. Tick/Untick 15.End\n");
     int user_command;
     do {
         cout << "Enter command: ";

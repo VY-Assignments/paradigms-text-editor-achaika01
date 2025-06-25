@@ -1,9 +1,12 @@
+#define _CRT_SECURE_NO_WARNINGS
 #include <vector>
 #include <string>
 #include <iostream>
 #include "Headers/Line.h"
 #include "Headers/CheckListLine.h"
+#include "Headers/TextLine.h"
 #include "Headers/TextClass.h"
+#include "Headers/ContactLine.h"
 using namespace std;
 
 void TextClass::add_line(int line_type) {
@@ -23,8 +26,27 @@ void TextClass::add_line(int line_type) {
 		break;
 	}
 	case 2:
+	{
+		string input;
+		cout << "Enter text: ";
+		cin >> input;
+
+		char* new_text_line = (char*)malloc((input.length() + 1) * sizeof(char));
+		strcpy(new_text_line, input.c_str());
+		text.push_back(new TextLine(new_text_line));
 		break;
+	}
 	case 3:
+		string fullname;
+		string phone_number;
+		cout << "Enter fullname: " << endl;
+		cin.ignore();
+		getline(cin, fullname);
+
+		cout << "Enter number: " << endl;
+		getline(cin, phone_number);
+
+		text.push_back(new ContactLine(fullname, phone_number));
 		break;
 	}
 }
@@ -48,5 +70,7 @@ void TextClass::us_command(int com) {
 	case 2:
 		this->printAll();
 		break;
+	case 3:
+		cout << "not implemented" << endl;
 	}
 }
