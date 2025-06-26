@@ -22,10 +22,10 @@
     <ClCompile Include="CaesarCipher.cpp" />
     <ClCompile Include="CheckListLine.cpp" />
     <ClCompile Include="ContactLine.cpp" />
+    <ClCompile Include="CommandLineInterface.cpp" />
     <ClCompile Include="Line.cpp" />
     <ClCompile Include="TextClass.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="TextEditor.cpp" />
     <ClCompile Include="TextLine.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -34,6 +34,7 @@
   <ItemGroup>
     <ClInclude Include="Headers\CaesarCipher.h" />
     <ClInclude Include="Headers\CheckListLine.h" />
+    <ClInclude Include="Headers\CommandLineInterface.h" />
     <ClInclude Include="Headers\ContactLine.h" />
     <ClInclude Include="Headers\Line.h" />
     <ClInclude Include="Headers\TextClass.h" />

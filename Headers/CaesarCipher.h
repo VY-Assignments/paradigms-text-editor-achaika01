@@ -1,9 +1,11 @@
 #pragma once
 #include <windows.h>
 #include <string>
+#include <cstddef>
+#include <vector>
 
-typedef char* (*encrypt_ptr_t)(const char* rawText, int key);
-typedef char* (*decrypt_ptr_t)(const char* encryptedText, int key);
+typedef char* (*encrypt_ptr_t)(const unsigned char*, unsigned char*, size_t, int);
+typedef char* (*decrypt_ptr_t)(const unsigned char*, unsigned char*, size_t, int);
 
 class CaesarCipher {
     HINSTANCE handle = nullptr;
@@ -15,8 +17,6 @@ public:
 
     ~CaesarCipher();
 
-    bool is_loaded() const;
-
-    std::string encrypt(const std::string& raw_text, int key);
-    std::string decrypt(const std::string& encrypted_text, int key);
+    std::vector<std::byte> encrypt(const std::vector<std::byte>& data, int key);
+    std::vector<std::byte> decrypt(const std::vector<std::byte>& data, int key);
 };

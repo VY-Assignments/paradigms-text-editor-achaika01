@@ -26,18 +26,24 @@ CaesarCipher::~CaesarCipher() {
     }
 }
 
-bool CaesarCipher::is_loaded() const {
-    return handle != nullptr && encrypt_ptr != nullptr && decrypt_ptr != nullptr;
+std::vector<std::byte> CaesarCipher::encrypt(const std::vector<std::byte>& data, int key){
+    if (!encrypt_ptr) return {};
+    
+    std::vector<std::byte> result(data.size());
+    encrypt_ptr(reinterpret_cast<const unsigned char*>(data.data()),
+        reinterpret_cast<unsigned char*>(result.data()),
+        data.size(), key);
+
+    return result;       
 }
 
-std::string CaesarCipher::encrypt(const std::string& text, int key) {
-    if (!encrypt_ptr) return "";
-    char* result = encrypt_ptr(text.c_str(), key);
-    return result;
-}
+std::vector<std::byte> CaesarCipher::decrypt(const std::vector<std::byte>& data, int key) {
+    if (!decrypt_ptr) return {};
+    
+    std::vector<std::byte> result(data.size());
+    decrypt_ptr(reinterpret_cast<const unsigned char*>(data.data()),
+        reinterpret_cast<unsigned char*>(result.data()),
+        data.size(), key);
 
-std::string CaesarCipher::decrypt(const std::string& text, int key) {
-    if (!decrypt_ptr) return "";
-    char* result = decrypt_ptr(text.c_str(), key);
     return result;
 }

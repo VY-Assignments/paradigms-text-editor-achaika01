@@ -10,9 +10,6 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="TextEditor.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="TextLine.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -28,6 +25,12 @@
     <ClCompile Include="Line.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="CaesarCipher.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CommandLineInterface.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include=".gitignore" />
@@ -39,5 +42,7 @@
     <ClInclude Include="Headers\CheckListLine.h" />
     <ClInclude Include="Headers\ContactLine.h" />
     <ClInclude Include="Headers\TextClass.h" />
+    <ClInclude Include="Headers\CaesarCipher.h" />
+    <ClInclude Include="Headers\CommandLineInterface.h" />
   </ItemGroup>
 </Project>

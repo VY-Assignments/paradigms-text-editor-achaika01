@@ -56,20 +56,23 @@ void TextClass::printAll() const {
 	}
 }
 
-void TextClass::us_command(int com) {
-	switch (com) {
-	case 1:
-		int line_type;
-		do {
-			printf("Choose type of line: \n1.Check list line\n2.Text line\n3.Contact line\nEnter number: ");
-			std::cin >> line_type;
-			this->add_line(line_type);
-		} while (line_type != 1 && line_type != 2 && line_type != 3);
-		break;
-	case 2:
-		this->printAll();
-		break;
-	case 3:
-		std::cout << "not implemented" << std::endl;
+size_t TextClass::size() const {
+	return text.size();
+}
+
+Line* TextClass::get_line(size_t index) const {
+	if (index < text.size())
+		return text[index];
+	return nullptr;
+}
+
+void TextClass::add_line(Line* line) {
+	text.push_back(line);
+}
+
+void TextClass::clear() {
+	for (Line* line : text) {
+		delete line;
 	}
+	text.clear();
 }
