@@ -1,15 +1,15 @@
-#define _CRT_SECURE_NO_WARNINGS
-#include "Headers/TextEditor.h"
-#include "Headers/Line.h"
-#include "Headers/TextLine.h"
-#include <iostream>
-#include <stdlib.h>
-#include <stack>
-using namespace std;
-
-TextEditor::TextEditor() {
-
-}
+//#define _CRT_SECURE_NO_WARNINGS
+//#include "Headers/TextEditor.h"
+//#include "Headers/Line.h"
+//#include "Headers/TextLine.h"
+//#include <iostream>
+//#include <stdlib.h>
+//#include <stack>
+//using namespace std;
+//
+//TextEditor::TextEditor() {
+//
+//}
 
 //void TextEditor::resize_buffer() {
 //    char* temp = (char*)realloc(buffer.buffer_array, buffer.size * 2 * sizeof(char));
@@ -767,6 +767,6 @@ TextEditor::TextEditor() {
 //    goes_to_undostack = true;
 //};
 
-TextEditor::~TextEditor() {
-
-}
+//TextEditor::~TextEditor() {
+//
+//}

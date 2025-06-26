@@ -3,6 +3,7 @@
 #include "Line.h"
 #include <cstring> 
 #include <vector>
+#include <cstddef>
 
 class TextLine : public Line {
 	char* textline;

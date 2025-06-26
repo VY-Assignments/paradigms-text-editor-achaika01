@@ -4,10 +4,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 17.13.35931.197
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TextEditor", "TextEditor.vcxproj", "{B585820A-E1B2-4B11-82F8-94727C7D4FA3}"
+	ProjectSection(ProjectDependencies) = postProject
+		{B3F71A9B-0DEF-4556-9979-BCFE2B9B0F24} = {B3F71A9B-0DEF-4556-9979-BCFE2B9B0F24}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "caesarCipher", "..\caesarCipher\caesarCipher.vcxproj", "{B3F71A9B-0DEF-4556-9979-BCFE2B9B0F24}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TestCaesarCipher", "..\TestCaesarCipher\TestCaesarCipher.vcxproj", "{953B73B4-782B-48F2-8A5B-CAEFFEF20437}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,14 +34,6 @@ Global
 		{B3F71A9B-0DEF-4556-9979-BCFE2B9B0F24}.Release|x64.Build.0 = Release|x64
 		{B3F71A9B-0DEF-4556-9979-BCFE2B9B0F24}.Release|x86.ActiveCfg = Release|Win32
 		{B3F71A9B-0DEF-4556-9979-BCFE2B9B0F24}.Release|x86.Build.0 = Release|Win32
-		{953B73B4-782B-48F2-8A5B-CAEFFEF20437}.Debug|x64.ActiveCfg = Debug|x64
-		{953B73B4-782B-48F2-8A5B-CAEFFEF20437}.Debug|x64.Build.0 = Debug|x64
-		{953B73B4-782B-48F2-8A5B-CAEFFEF20437}.Debug|x86.ActiveCfg = Debug|Win32
-		{953B73B4-782B-48F2-8A5B-CAEFFEF20437}.Debug|x86.Build.0 = Debug|Win32
-		{953B73B4-782B-48F2-8A5B-CAEFFEF20437}.Release|x64.ActiveCfg = Release|x64
-		{953B73B4-782B-48F2-8A5B-CAEFFEF20437}.Release|x64.Build.0 = Release|x64
-		{953B73B4-782B-48F2-8A5B-CAEFFEF20437}.Release|x86.ActiveCfg = Release|Win32
-		{953B73B4-782B-48F2-8A5B-CAEFFEF20437}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

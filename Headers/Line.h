@@ -1,6 +1,8 @@
 #pragma once
 #include <bit>
 #include <cstdint>
+#include <vector>
+#include <cstddef>
 
 enum class LineType : uint8_t {
 	TextLine = 1,

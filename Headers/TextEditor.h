@@ -3,12 +3,11 @@
 #include <vector>
 #include "Line.h"
 #pragma once
-using namespace std;
 
 class TextEditor
 {
 private:
-	vector<Line*> text;
+	std::vector<Line*> text;
 
 	bool goes_to_undostack = true;
 
@@ -80,9 +79,9 @@ private:
 
 	};
 
-	stack<UndoAction*> undo_stack;
+	std::stack<UndoAction*> undo_stack;
 
-	stack<UndoAction*> redo_stack;
+	std::stack<UndoAction*> redo_stack;
 
 	Buffer buffer;
 	void resize_buffer();

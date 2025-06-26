@@ -1,20 +1,21 @@
 #include "Headers/ContactLine.h"
 #include <iostream>
-using namespace std;
+#include <vector>
+#include <cstddef>
 
 void ContactLine::print() const {
-	cout << "Contact - " << fullname << ", E-mail: " << email << endl;
+	std::cout << "Contact - " << fullname << ", E-mail: " << email << std::endl;
 }
 
 LineType ContactLine::get_type() const {
 	return LineType::ContactLine;
 }
 
-vector<byte> ContactLine::serialize() const {
-	vector<byte> bytes;
+std::vector<std::byte> ContactLine::serialize() const {
+	std::vector<std::byte> bytes;
 	uint64_t start_from = 0;
 
-	byte linetype_b = static_cast<byte>(LineType::ContactLine);
+	std::byte linetype_b = static_cast<std::byte>(LineType::ContactLine);
 	bytes.push_back(linetype_b);
 	start_from += sizeof(linetype_b);
 
@@ -38,7 +39,7 @@ vector<byte> ContactLine::serialize() const {
 }
 
 ContactLine* ContactLine::deserialize(const std::byte* data, size_t size) {
-	const size_t type_size = sizeof(byte);
+	const size_t type_size = sizeof(std::byte);
 	const size_t len_size = sizeof(uint64_t);
 
 	if (size < type_size + len_size) return nullptr;
@@ -54,7 +55,7 @@ ContactLine* ContactLine::deserialize(const std::byte* data, size_t size) {
 
 	if (size < len_name) return nullptr;
 
-	string name(reinterpret_cast<const char*>(data), len_name - 1);
+	std::string name(reinterpret_cast<const char*>(data), len_name - 1);
 	data += len_name;
 	size -= len_name;
 
@@ -65,6 +66,7 @@ ContactLine* ContactLine::deserialize(const std::byte* data, size_t size) {
 
 	if (size < len_email) return nullptr;
 
-	string email(reinterpret_cast<const char*>(data), len_email - 1);
+	std::string email(reinterpret_cast<const char*>(data), len_email - 1);
 
 	return new ContactLine(name, email);
+}

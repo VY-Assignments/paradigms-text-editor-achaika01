@@ -1,6 +1,6 @@
 #include "Headers/TextLine.h"
 #include <iostream>
-using namespace std;
+#include <cstddef>
 
 TextLine::TextLine(const char* t) {
     textline = new char[strlen(t) + 1];
@@ -8,17 +8,17 @@ TextLine::TextLine(const char* t) {
 }
 
 void TextLine::print() const{
-	cout << "Text: " << textline << endl;
+    std::cout << "Text: " << textline << std::endl;
 }
 
 LineType TextLine::get_type() const {
     return LineType::TextLine;
 }
 
-vector<byte> TextLine::serialize() const {
-    vector<byte> bytes;
+std::vector<std::byte> TextLine::serialize() const {
+    std::vector<std::byte> bytes;
 
-    byte linetype_b = static_cast<byte>(LineType::TextLine);
+    std::byte linetype_b = static_cast<std::byte>(LineType::TextLine);
     bytes.push_back(linetype_b);
 
     uint64_t len = strlen(textline) + 1;

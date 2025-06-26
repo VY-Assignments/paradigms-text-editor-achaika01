@@ -3,6 +3,7 @@
 #include <vector>
 #include "CheckListLine.h"
 #include "Line.h"
+#include <cstddef>
 
 class CheckListLine : public Line {
 	std::string item;

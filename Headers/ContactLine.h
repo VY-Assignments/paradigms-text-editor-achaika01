@@ -2,6 +2,7 @@
 #include <string>
 #include <vector>
 #include "Line.h"
+#include <cstddef>
 
 class ContactLine : public Line {
 	std::string fullname;

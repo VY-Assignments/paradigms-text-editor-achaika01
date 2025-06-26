@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="CaesarCipher.cpp" />
     <ClCompile Include="CheckListLine.cpp" />
     <ClCompile Include="ContactLine.cpp" />
     <ClCompile Include="Line.cpp" />
@@ -31,6 +32,7 @@
     <None Include=".gitignore" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Headers\CaesarCipher.h" />
     <ClInclude Include="Headers\CheckListLine.h" />
     <ClInclude Include="Headers\ContactLine.h" />
     <ClInclude Include="Headers\Line.h" />
