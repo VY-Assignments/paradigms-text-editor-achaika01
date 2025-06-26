@@ -1,11 +1,12 @@
 #pragma once
+#include <vector>
+#include <memory>
 #include "TextClass.h"
 
 class CommandLineInterface
 {
-	TextClass text;
 
-	std::vector<TextClass> tabs;
+	std::vector<std::unique_ptr<TextClass>> tabs;
 	size_t active_tab = 0;
 
 public:

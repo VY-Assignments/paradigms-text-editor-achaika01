@@ -20,7 +20,7 @@ void TextClass::add_line(int line_type) {
 		}
 		std::string input;
 		std::cout << "Enter text: ";
-		std::cin >> input;
+		std::getline(std::cin >> std::ws, input);
 		text.push_back(new CheckListLine(input, checked));
 		break;
 	}
@@ -28,7 +28,7 @@ void TextClass::add_line(int line_type) {
 	{
 		std::string input;
 		std::cout << "Enter text: ";
-		std::cin >> input;
+		std::getline(std::cin >> std::ws, input);
 
 		char* new_text_line = (char*)malloc((input.length() + 1) * sizeof(char));
 		strcpy(new_text_line, input.c_str());
@@ -38,12 +38,11 @@ void TextClass::add_line(int line_type) {
 	case 3:
 		std::string fullname;
 		std::string phone_number;
-		std::cout << "Enter fullname: " << std::endl;
-		std::cin.ignore();
-		std::getline(std::cin, fullname);
+		std::cout << "Enter fullname: ";
+		std::getline(std::cin >> std::ws, fullname);
 
-		std::cout << "Enter number: " << std::endl;
-		std::getline(std::cin, phone_number);
+		std::cout << "Enter number: ";
+		std::getline(std::cin >> std::ws, phone_number);
 
 		text.push_back(new ContactLine(fullname, phone_number));
 		break;

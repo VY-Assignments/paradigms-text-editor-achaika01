@@ -6,11 +6,11 @@
 #include "Headers/CaesarCipher.h"
 
 CommandLineInterface::CommandLineInterface() {
-	tabs.emplace_back();
+	tabs.emplace_back(std::make_unique<TextClass>());
 }
 
 void CommandLineInterface::new_tab() {
-	tabs.emplace_back();
+	tabs.emplace_back(std::make_unique<TextClass>());
 	active_tab = tabs.size() - 1;
 	std::cout << "Added new tab. Current tab: " << active_tab << std::endl;
 }
@@ -34,11 +34,11 @@ void CommandLineInterface::us_command(int com) {
 			std::cout << "Choose type of line:\n1. Check list line\n2. Text line\n3. Contact line\nEnter number: ";
 			std::cin >> line_type;
 		} while (line_type != 1 && line_type != 2 && line_type != 3);
-		tabs[active_tab].add_line(line_type);
+		tabs[active_tab]->add_line(line_type);
 		break;
 	}
 	case 2:
-		tabs[active_tab].printAll();
+		tabs[active_tab]->printAll();
 		break;
 	case 3:
 	{
@@ -131,7 +131,7 @@ void CommandLineInterface::savefile(const std::string& filename) const {
 		std::cout << "Cannot open file for writing\n";
 		return;
 	}
-	const TextClass& tab = tabs[active_tab];
+	const TextClass& tab = *tabs[active_tab];
 
 	uint64_t count = tab.size();
 	out.write(reinterpret_cast<const char*>(&count), sizeof(count));
@@ -151,7 +151,7 @@ void CommandLineInterface::savefile(const std::string& filename) const {
 }
 
 void CommandLineInterface::loadfile(const std::string& filename) {
-	TextClass& tab = tabs[active_tab];
+	TextClass& tab = *tabs[active_tab];
 	tab.clear();
 
 	std::ifstream in(filename, std::ios::binary);
