@@ -5,9 +5,16 @@ class CommandLineInterface
 {
 	TextClass text;
 
+	std::vector<TextClass> tabs;
+	size_t active_tab = 0;
+
 public:
 
-	CommandLineInterface() {};
+	CommandLineInterface();
+
+	void new_tab();
+
+	void switch_tab(size_t index);
 
 	void run();
 	void us_command(int com);
